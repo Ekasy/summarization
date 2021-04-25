@@ -11,7 +11,7 @@ class TextRank(object):
 
     def rate_sentences(self, document, vector_model='tf-idf', path_to_model="models/word2vec.model"):
         matrix = self._create_matrix(document, vector_model, path_to_model)
-        ranks = self.power_method(matrix, self.epsilon)
+        ranks = self._calc_ranks(matrix, self.epsilon)
         return ranks
 
     def _create_matrix(self, document, vector_model, path_to_model):
@@ -36,7 +36,7 @@ class TextRank(object):
         weights = np.divide(weights, weights.sum(axis=1).reshape(-1, 1))
         return weights
 
-    def power_method(self, matrix, epsilon):
+    def _calc_ranks(self, matrix, epsilon):
         p_prev = np.ones((matrix.shape[0],)) / matrix.shape[0]
         loss = 1.0
 

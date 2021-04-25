@@ -8,13 +8,14 @@ if __name__ == "__main__":
         document = f.read()
         f.close()
 
+
     preproc = Preprocessing()
     corpus = preproc.preprocess(document)
 
-    # text_rank = TextRank()
-    lsa = LSA()
-    ranks = lsa.rate_sentences(corpus, vector_model='word2vec')
-    # ranks = text_rank.rate_sentences(corpus, vector_model='word2vec')
+    text_rank = TextRank()
+    ranks = text_rank.rate_sentences(corpus, vector_model='tf-idf')
+    # lsa = LSA()
+    # ranks = lsa.rate_sentences(corpus, vector_model='tf-idf')
 
     summary = SummaryGenerator().summary(preproc.to_corpus(document), ranks)
 
@@ -26,4 +27,5 @@ if __name__ == "__main__":
     '''
     print(summary)
 
-    Metric().rouge(summary, reference, n=2)
+    #Metric().rouge(summary, reference, n=2)
+    Metric().cosine_similarity(summary, reference)

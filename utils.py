@@ -3,6 +3,7 @@ import pymorphy2
 import nltk
 from nltk.corpus import stopwords
 import re
+from word2vec_prep import EmbeddingParser
 
 nltk.download('stopwords')
 
@@ -25,6 +26,25 @@ class SummaryGenerator(object):
 
 
 class Metric(object):
+    def cosine_similarity(self, predict, y_true, vec='word2vec'):
+        vec_predict = self._to_wordvec(predict)
+        vec_true = self._to_wordvec(y_true)
+
+        num = np.absolute(np.dot(vec_predict, vec_true))
+        denum = np.linalg.norm(vec_predict) * np.linalg.norm(vec_true)
+        print('Косинусное сходство:', round(num / denum, 4))
+
+    def _to_wordvec(self, text, path_to_model="models/word2vec.model"):
+        corpus = Preprocessing().preprocess(text)
+        model = EmbeddingParser(path_to_model)
+        n_vectors = model.transform(corpus)
+        sent_count, dim = len(n_vectors), 300
+
+        vectorized_document = np.zeros((sent_count, dim))
+        for i, sent in enumerate(n_vectors):
+            vectorized_document[i] = np.sum(sent, axis=0)
+        return np.sum(vectorized_document, axis=0)
+
     def rouge(self, predict, y_true, n=1):
         predict_tokens = self._get_tokens(predict, n)
         y_true_tokens = self._get_tokens(y_true, n)
